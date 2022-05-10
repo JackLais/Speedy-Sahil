@@ -61,6 +61,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let cactusCategory = 1 << 2 as UInt32
     let birdCategory = 1 << 3 as UInt32
     
+    // entry point
     override func didMove(to view: SKView) {
         
         let bGround = SKSpriteNode(imageNamed: "")
@@ -152,7 +153,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 // Remove the default sprite, make the jumping animation
                 //dinoSprite.removeFromParent()
                 // implicitly handles ground check
-                //dinosaurNode.removeAllChildren()
                 createJump()
         
                 
@@ -173,7 +173,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 spawnRate = Double.random(in: 1.0 ..< 3.5)
                 
                 if(Int.random(in: 0...10) < 8){
-                   // spawnCactus()
+                    spawnCactus()
                 } /*else {
                     spawnBird()
                 }*/
@@ -209,14 +209,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         print("Contact: \(contact.bodyA.node), \(contact.bodyB.node)")
         if(hitCactus(contact) || hitBird(contact)){
             run(dieSound)
-            	
+                
             resetInstructions.position = CGPoint(x: 1000, y: self.frame.midY)
             gameOver()
         }
         
         if hitGround(contact) {
-            endJump()
-            
+            groundCheck = true
         }
             
 }
@@ -234,12 +233,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func hitGround (_ contact: SKPhysicsContact) -> Bool {
+        
         let output = contact.bodyA.categoryBitMask & groundCategory == groundCategory ||
                 contact.bodyB.categoryBitMask & groundCategory == groundCategory
         print("Hit ground? \(output)")
         return output
-        
-        
     }
     
     func resetGame() {
@@ -288,7 +286,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
  
         let runningAnimation = SKAction.animate(with: [sahilTexture1, sahilTexture2, sahilTexture3, sahilTexture4, sahilTexture5, sahilTexture6, sahilTexture7, sahilTexture8, sahilTexture9, sahilTexture10, sahilTexture11, sahilTexture12], timePerFrame: 0.05)
         
-       // createDinosaur()
+        createDinosaur()
         activeSprite.position = CGPoint(x: self.frame.size.width * 0.15, y: dinoYPosition!)
         //dinoSprite.run(SKAction.repeatForever(runningAnimation))
     }
@@ -308,12 +306,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let deadDinoSprite = SKSpriteNode(texture: deadDinoTexture)
         deadDinoSprite.setScale(deadScale)
         
-        
-        activeSprite.removeFromParent()
-        activeSprite.texture = deadDinoTexture
-        dinosaurNode.addChild(activeSprite)
         activeSprite.removeAllActions()
-       
+        activeSprite.texture = deadDinoTexture
     }
     
     func createAndMoveGround() {
@@ -768,7 +762,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func endJump() {
         // Just replace the state!
-       
         // Might even be able to not remove and readd
         activeSprite.removeFromParent()
         activeSprite = defaultSprite
@@ -776,7 +769,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         // Set ground
         groundCheck = true
-       
     }
     
     func spawnCactus() {
@@ -891,4 +883,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     
 }
+ 
+
 
