@@ -24,6 +24,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     //status
     //these check on if sahil is running, or is jumping; 1 means theres one on screen, 0 means theres none on screen
     var groundCheck: Bool = true
+    var gameOverCheck: Bool = false
     
     //game status
     
@@ -135,7 +136,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Debug 2
         print("Touch begin, \(groundCheck)")
         
-        if(gameNode.speed < 1.0){
+        if(gameOverCheck) {//gameNode.speed < 1.0){
             resetGame()
             return
         }
@@ -206,16 +207,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
-        print("Contact: \(contact.bodyA.node), \(contact.bodyB.node)")
-        if(hitCactus(contact) || hitBird(contact)){
-            run(dieSound)
-                
-            resetInstructions.position = CGPoint(x: 1000, y: self.frame.midY)
-            gameOver()
-        }
+        //print("Contact: \(contact.bodyA.node), \(contact.bodyB.node)")
         
-        if hitGround(contact) {
-            groundCheck = true
+        if (!gameOverCheck) {
+            if(hitCactus(contact) || hitBird(contact)){
+                run(dieSound)
+                    
+                resetInstructions.position = CGPoint(x: 1000, y: self.frame.midY)
+                gameOver()
+            }
+            else if hitGround(contact) {
+                endJump()
+                //groundCheck = true
+            }
         }
             
 }
@@ -236,7 +240,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let output = contact.bodyA.categoryBitMask & groundCategory == groundCategory ||
                 contact.bodyB.categoryBitMask & groundCategory == groundCategory
-        print("Hit ground? \(output)")
+        //print("Hit ground? \(output)")
         return output
     }
     
@@ -246,6 +250,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         groundSpeed = 500
         score = 0
         groundCheck = true
+        gameOverCheck = false
         
         dinosaurNode.removeAllChildren()
         cactusNode.removeAllChildren()
@@ -293,7 +298,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func gameOver() {
         gameNode.speed = 0.0
-        
+        gameOverCheck = true
         
         resetInstructions.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         resetInstructions.fontColor = SKColor.black
@@ -615,6 +620,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         groundCheck = false
         
         // Just replace the state!
+        //activeSprite.removeFromParent()
         activeSprite.removeFromParent()
         activeSprite = jumpingSprite
         dinosaurNode.addChild(activeSprite)
@@ -626,6 +632,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         if activeSprite.position.y <= (dinoYPosition ?? 0) && gameNode.speed > 0 {
             print("Apply impulse")
+            print(dinoHopForce)
+            print(activeSprite.physicsBody?.velocity)
             activeSprite.physicsBody?.applyImpulse(CGVector(dx: 0, dy: dinoHopForce))
             run(jumpSound)
             

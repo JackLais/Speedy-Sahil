@@ -3,4 +3,23 @@
    uuid = "EC87D249-EB76-4D09-9FC0-BD356C87F6B0"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "45B6E221-7BDC-487B-90A7-286419FB47B3"
+            shouldBeEnabled = "No"
+            nameForDebugger = "OnJump"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Speedy Sahil/GameScene.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "618"
+            endingLineNumber = "618"
+            landmarkName = "createJump()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>
