@@ -134,7 +134,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
         // Debug 2
-        print("Touch begin, \(groundCheck)")
+        print("Touch begin, groundCheck is \(groundCheck)")
         
         if(gameOverCheck) {//gameNode.speed < 1.0){
             resetGame()
@@ -617,7 +617,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func createJump() {
         
-        groundCheck = false
+       
         
         // Just replace the state!
         //activeSprite.removeFromParent()
@@ -625,17 +625,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         activeSprite = jumpingSprite
         dinosaurNode.addChild(activeSprite)
         
+        groundCheck = false
+        
         // dino y position is baseline ground
         if dinoYPosition == nil {
             // figure out how to throw errors
             print("Just letting you know that the dino Y position is invalid (null)")
         }
-        if activeSprite.position.y <= (dinoYPosition ?? 0) && gameNode.speed > 0 {
+        if activeSprite.position.y <= (dinoYPosition ?? 0) && gameOverCheck != true {
             print("Apply impulse")
             print(dinoHopForce)
             print(activeSprite.physicsBody?.velocity)
+           
             activeSprite.physicsBody?.applyImpulse(CGVector(dx: 0, dy: dinoHopForce))
             run(jumpSound)
+            
             
         }
         
@@ -772,6 +776,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Just replace the state!
         // Might even be able to not remove and readd
         activeSprite.removeFromParent()
+        dinosaurNode.removeAllChildren()
         activeSprite = defaultSprite
         dinosaurNode.addChild(activeSprite)
         
