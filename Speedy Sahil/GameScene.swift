@@ -193,13 +193,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 timeSinceLastSpawn = currentTime
                 spawnRate = Double.random(in: 1.0 ..< 3.5)
                 
-                /*
+                
                 if(Int.random(in: 0...10) < 8){
                     spawnCactus()
-                } else {
+                }/* else {
                     spawnBird()
-                }
-                */
+                    Birds are in v0.2 (later)
+                }*/
+                
             }
            /* if sahilCheck == true && groundCheck == true {
                 sahilNum = 1
@@ -233,14 +234,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         print("Contact: \(contact.bodyA.node), \(contact.bodyB.node)")
 
         // If you hit a bird or a barrel, game over
-        if(hitCactus(contact) || hitBird(contact)){
-            run(dieSound)
-            //resetInstructions.position = CGPoint(x: 1000, y: self.frame.midY)
-            gameOver()
-        }
-        // else if you hit the ground, then regain the ability to jump
-        else if hitGround(contact) {
-            endJump()
+        if (!gameOverCheck) {
+            if(hitCactus(contact) || hitBird(contact)){
+                run(dieSound)
+                //resetInstructions.position = CGPoint(x: 1000, y: self.frame.midY)
+                gameOver()
+            }
+            // else if you hit the ground, then regain the ability to jump
+            else if hitGround(contact) {
+                endJump()
+            }
         }
     }
     
@@ -262,7 +265,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return output
     }
 
-    var physicsBox: CSSize!
+    var physicsBox: CGSize!
     var runningAnimation: SKAction!
     var jumpAnimation: SKAction!
 
@@ -270,19 +273,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func initTexturesAndScales() {
 
         // Make the jumping animation textures
-        let jumpTextures: [SKTexture] = []
-        for i in 0..<43 {
-            jumpTextures.append(SKTexture(imageNamed: "sahil.assets/jump/frame_\(String(format: "%05d", i))"))
-            jumpTextures[i].filteringMode = .nearest
+        var jumpTextures: [SKTexture] = []
+        for i in 1..<43 {
+            jumpTextures.append(SKTexture(imageNamed: "sahil.assets/jump/frame_\(String(format: "%05d", i)).png"))
+            jumpTextures[i-1].filteringMode = .nearest
         }
         jumpAnimation = SKAction.animate(with: jumpTextures, timePerFrame: 0.05)
         dinoScale = 0.5
 
         // Make the running animation textures
-        let sahilTextures: [SKTexture] = []
-        for i in 0..<13 {
-            sahilTextures.append(SKTexture(imageNamed: "sahil.assets/sprint/frame_\(String(format: "%05d", i))"))
-            sahilTextures[i].filteringMode = .nearest
+        var sahilTextures: [SKTexture] = []
+        for i in 1..<13 {
+            sahilTextures.append(SKTexture(imageNamed: "sahil.assets/sprint/frame_\(String(format: "%05d", i)).png"))
+            sahilTextures[i-1].filteringMode = .nearest
         }
         runningAnimation = SKAction.animate(with: sahilTextures, timePerFrame: 0.05)
         jumpScale = 0.5
@@ -331,34 +334,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         // Reset the position of the active sprite.
         activeSprite.position = CGPoint(x: self.frame.size.width * 0.15, y: dinoYPosition!)
-
+        print(activeSprite.position)
     }
 
     // Set the sprite texture with a custom scaling.
-    func setStaticSpriteTexture(texture: SKTexture, scale: Double) {
+    func setStaticSpriteTexture(texture: SKTexture, scale: CGFloat) {
         activeSprite.removeAllActions()
-        activeSprite.texture = texture
+        let action = SKAction.setTexture(texture, resize: true)
+        activeSprite.run(action)
         activeSprite.size = texture.size()
         activeSprite.setScale(scale)
     }
 
     // Set the static sprite texture with a custom scaling.
-    func setAnimatedSpriteAnimation(animation: SKAction, scale: Double) {
+    func setAnimatedSpriteAnimation(animation: SKAction, scale: CGFloat) {
+        // Prevent clutter
         activeSprite.removeAllActions()
         activeSprite.setScale(scale)
         activeSprite.run(SKAction.repeatForever(animation))
     }
     
     func gameOver() {
+        gameOverCheck = true
         gameNode.speed = 0.0
         
         resetInstructions.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         resetInstructions.fontColor = SKColor.black
-        
-        let deadScale = 0.3 as CGFloat
 
         // TO DO: CHANGE THE TEXTURE AND THE SCALE ON THE DEAD SPRITE.
-        setSpriteTexture(deadTexture, deadScale)
+        setStaticSpriteTexture(texture: deadTexture, scale: deadScale)
     }
     
     func createAndMoveGround() {
@@ -392,13 +396,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func addCollisionToGround() {
         let groundContactNode = SKNode()
         groundContactNode.position = CGPoint(x: 0, y: groundHeight! - 30)
-        // resititution controls bounciness of the physicsbody
-        groundContactNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: self.frame.size.width * 3,
-                                                                          height: groundHeight!),
-                                                      restitution: 1.0)
+        
+        groundContactNode.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: self.frame.size.width * 3, height: groundHeight!))
         groundContactNode.physicsBody?.friction = 0.0
         groundContactNode.physicsBody?.isDynamic = false
         groundContactNode.physicsBody?.categoryBitMask = groundCategory
+        // resititution controls bounciness of the physicsbody
+        groundContactNode.physicsBody?.restitution = 0.0
         
         groundNode.addChild(groundContactNode)
     }
@@ -477,12 +481,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func createDinosaur() {
         // Get the screen width
-        let screenWidth = self.frame.size.width
+        // let screenWidth = self.frame.size.width
 
         // Remove any extra things and add a nice new body
-        dinosaurNode.removeAllChildren()
         activeSprite = SKSpriteNode()
-        dinosaurNode.addChild(activeSprite)
         
         // Reset the activeSprite's physicsBody every time it's reset.
         activeSprite.physicsBody = SKPhysicsBody(rectangleOf: physicsBox)
@@ -491,11 +493,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         activeSprite.physicsBody?.categoryBitMask = dinoCategory
         activeSprite.physicsBody?.contactTestBitMask = birdCategory | cactusCategory | groundCategory
         activeSprite.physicsBody?.collisionBitMask = groundCategory
+        activeSprite.physicsBody?.restitution = 0.0
+        
+        // Needed to get the animation running for some reason
+        setStaticSpriteTexture(texture: SKTexture(imageNamed: "sahil.assets/sprint/frame_00001.png"), scale: dinoScale)
         
         // Set the position off the dinosaurNode
         dinoYPosition = getGroundHeight() + physicsBox.height
         activeSprite.position = CGPoint(x: self.frame.size.width * 0.15, y: dinoYPosition!)
-        setAnimatedSpriteAnimation(runningAnimation, dinoScale)
+        setAnimatedSpriteAnimation(animation: runningAnimation, scale: dinoScale)
+        
+        // Set dinosaur node's child
+        dinosaurNode.removeAllChildren()
+        dinosaurNode.addChild(activeSprite)
     }
     
     func createJump() {
@@ -503,7 +513,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         groundCheck = false
         
         // Just replace the state!
-        setAnimatedSpriteAnimation(jumpAnimation, jumpScale)
+        setAnimatedSpriteAnimation(animation: jumpAnimation, scale: jumpScale)
         if activeSprite.position.y <= (dinoYPosition ?? 0) && gameNode.speed > 0 {
             print("Apply impulse")
             print(dinoHopForce)
@@ -516,13 +526,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func endJump() {
         // Replace textures and state.
-        setAnimatedSpriteAnimation(runningAnimation, dinoScale)
+        // This might get called multiple times if ground is bouncy
+        // make sure restitution is set to 0 for both the activeSprite an
+        // groundContactNode physicsBody
+        setAnimatedSpriteAnimation(animation: runningAnimation, scale: dinoScale)
         groundCheck = true
     }
     
     func spawnCactus() {
         //default was 3
-        let cactusTextures = ["barrel"]
+        //let cactusTextures = ["barrel"] not used!
         let cactusScale = 0.3 as CGFloat
         let hitBoxScale = 0.8 as CGFloat
         //texture
