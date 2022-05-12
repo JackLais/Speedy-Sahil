@@ -373,7 +373,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         groundTexture.filteringMode = .nearest
         
        //let homeButtonPadding = 50.0 as CGFloat
-        groundHeight = groundTexture.size().height * 0.5
+        // play around this this to get the ground to render correctly/
+        // place the player at the correct height?
+        groundHeight = groundTexture.size().height// * 0.5
         
         //ground actions
         let moveGroundLeft = SKAction.moveBy(x: -groundTexture.size().width,

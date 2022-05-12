@@ -61,8 +61,8 @@
             filePath = "Speedy Sahil/GameScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "532"
-            endingLineNumber = "532"
+            startingLineNumber = "534"
+            endingLineNumber = "534"
             landmarkName = "endJump()"
             landmarkType = "7">
          </BreakpointContent>
