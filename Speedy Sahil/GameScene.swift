@@ -74,12 +74,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var jumpScale: CGFloat = 0.5
     var jumpHitScale: CGFloat = 0.7
     
+    //important variables
+    var physicsBox: CGSize!
+    var runningAnimation: SKAction!
+    var jumpAnimation: SKAction!
+    
     // Entry point for the application.
     // Performes first-time initialization and then resets (starts) the game.
     override func didMove(to view: SKView) {
         
         // Add the background to the GameScene
-        let bGround = SKSpriteNode(imageNamed: "")
+        let bGround = SKSpriteNode(imageNamed: "sahil.assets/landscape/skyGround.png")
         bGround.position = CGPoint(x: size.width/2, y: size.height/2)
         addChild(bGround)
         
@@ -113,13 +118,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         birdNode.zPosition = foreground
         
         //score
+        let scoreHeight = self.frame.size.height
         score = 0
         scoreNode = SKLabelNode(fontNamed: "Arial")
         scoreNode.fontSize = 30
         scoreNode.zPosition = foreground
         scoreNode.text = "Score: 0"
         scoreNode.fontColor = SKColor.gray
-        scoreNode.position = CGPoint(x: 150, y: 100)
+        scoreNode.position = CGPoint(x: 200, y: scoreHeight - 50)
         
         //reset instructions
         resetInstructions = SKLabelNode(fontNamed: "Arial")
@@ -265,9 +271,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return output
     }
 
-    var physicsBox: CGSize!
-    var runningAnimation: SKAction!
-    var jumpAnimation: SKAction!
+   
 
     // one-time initialization for textures and scales
     func initTexturesAndScales() {
@@ -293,7 +297,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Make the dead texture and scale
         deadTexture = SKTexture(imageNamed: "sahil.assets/sahilStills/dead")
         deadTexture.filteringMode = .nearest
-        deadScale = 0.3
+        deadScale = 0.4
 
         // Make the physics box for Sahil
         physicsBox = CGSize(width: sahilTextures[0].size().width * dinoScale,
@@ -306,7 +310,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Set in-game parameters
         gameNode.speed = 1.0
         timeSinceLastSpawn = 0.0
-        groundSpeed = 500
+        groundSpeed = 1000
         score = 0
 
         // Set stateful variables
@@ -368,8 +372,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func createAndMoveGround() {
         let screenWidth = self.frame.size.width
         
+        
         //ground texture
-        let groundTexture = SKTexture(imageNamed: "sahil.assets/landscape/ground")
+        let groundTexture = SKTexture(imageNamed: "sahil.assets/landscape/ground.png")
         groundTexture.filteringMode = .nearest
         
        //let homeButtonPadding = 50.0 as CGFloat
@@ -378,6 +383,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         groundHeight = groundTexture.size().height// * 0.5
         
         //ground actions
+        
+        //SKAction.moveBy(x: -groundTexture.size().width
+        //duration: TimeInterval(screenWidth / groundSpeed)
         let moveGroundLeft = SKAction.moveBy(x: -groundTexture.size().width,
                                              y: 0.0, duration: TimeInterval(screenWidth / groundSpeed))
         let resetGround = SKAction.moveBy(x: groundTexture.size().width, y: 0.0, duration: 0.0)
@@ -411,8 +419,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func createMoon() {
         //texture
-        let moonTexture = SKTexture(imageNamed: "sahil.assets/landscape/moon")
-        let moonScale = 3.0 as CGFloat
+        let moonTexture = SKTexture(imageNamed: "sahil.assets/landscape/sun")
+        let moonScale = 1.0 as CGFloat
         moonTexture.filteringMode = .nearest
         
         //moon sprite
@@ -539,7 +547,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //default was 3
         //let cactusTextures = ["barrel"] not used!
         let cactusScale = 0.3 as CGFloat
-        let hitBoxScale = 0.8 as CGFloat
+        let hitBoxScale = 0.9 as CGFloat
         //texture
         let cactusTexture = SKTexture(imageNamed: "sahil.assets/obstacles/barrel")
         cactusTexture.filteringMode = .nearest
@@ -571,7 +579,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let distanceToMove = screenWidth + distanceOffscreen + texture.size().width
         
         //actions
-        let moveCactus = SKAction.moveBy(x: -distanceToMove, y: 0.0, duration: TimeInterval(screenWidth / groundSpeed))
+        let moveCactus = SKAction.moveBy(x: -distanceToMove, y: 0.0, duration: TimeInterval((3.0 * screenWidth) / groundSpeed))
         let removeCactus = SKAction.removeFromParent()
         let moveAndRemove = SKAction.sequence([moveCactus, removeCactus])
         
