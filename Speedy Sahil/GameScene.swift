@@ -32,8 +32,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var gameOverCheck: Bool = false
     
     // Sound effects
-    let jumpSound = SKAction.playSoundFileNamed("dino.assets/sounds/jump", waitForCompletion: false)
-    let dieSound = SKAction.playSoundFileNamed("dino.assets/sounds/die", waitForCompletion: false)
+    let jumpSound = SKAction.playSoundFileNamed("sahil.assets/sounds/jumpSFX", waitForCompletion: false)
+    let dieSound = SKAction.playSoundFileNamed("sahil.assets/sounds/die", waitForCompletion: false)
 
     // Textures
     var deadTexture: SKTexture!
@@ -52,7 +52,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var groundHeight: CGFloat?
     var dinoYPosition: CGFloat?
     var jumpYPosition: CGFloat?
-    var groundSpeed = 500 as CGFloat
+    var groundSpeed = 1000 as CGFloat
     
     // Consts controlling game movement
     let dinoHopForce = 750 as Int
@@ -70,8 +70,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     // Scales
     var deadScale: CGFloat = 0.3
-    var dinoScale: CGFloat = 0.5
-    var jumpScale: CGFloat = 0.5
+    var dinoScale: CGFloat = 0.6
+    var jumpScale: CGFloat = 0.6
     var jumpHitScale: CGFloat = 0.7
     
     //important variables
@@ -278,7 +278,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         // Make the jumping animation textures
         var jumpTextures: [SKTexture] = []
-        for i in 1..<43 {
+        for i in 1..<22 {
             jumpTextures.append(SKTexture(imageNamed: "sahil.assets/jump/frame_\(String(format: "%05d", i)).png"))
             jumpTextures[i-1].filteringMode = .nearest
         }
@@ -310,7 +310,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // Set in-game parameters
         gameNode.speed = 1.0
         timeSinceLastSpawn = 0.0
-        groundSpeed = 1000
+        groundSpeed = 500
         score = 0
 
         // Set stateful variables
@@ -337,7 +337,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         resetInstructions.fontColor = SKColor.cyan
 
         // Reset the position of the active sprite.
-        activeSprite.position = CGPoint(x: self.frame.size.width * 0.15, y: dinoYPosition!)
+        activeSprite.position = CGPoint(x: self.frame.size.width * 0.2, y: dinoYPosition!)
         print(activeSprite.position)
     }
 
@@ -451,14 +451,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createClouds() {
-        //texture
-        let cloudTexture = SKTexture(imageNamed: "sahil.assets/landscape/cloud")
-        let cloudScale = 3.0 as CGFloat
-        cloudTexture.filteringMode = .nearest
+        
+        let cloudTextures = ["cloud1", "cloud2", "cloud3", "cloud4", "cloudTennis"]
+        let cloudScale = 0.5 as CGFloat
+        
+        
         
         //clouds
         let numClouds = 3
         for i in 0 ..< numClouds {
+            //texture
+            let cloudTexture = SKTexture(imageNamed: "sahil.assets/landscape/" + cloudTextures.randomElement()!)
+            cloudTexture.filteringMode = .nearest
+            
             //create sprite
             let cloudSprite = SKSpriteNode(texture: cloudTexture)
             cloudSprite.setScale(cloudScale)
@@ -579,7 +584,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let distanceToMove = screenWidth + distanceOffscreen + texture.size().width
         
         //actions
-        let moveCactus = SKAction.moveBy(x: -distanceToMove, y: 0.0, duration: TimeInterval((3.0 * screenWidth) / groundSpeed))
+        let moveCactus = SKAction.moveBy(x: -distanceToMove, y: 0.0, duration: TimeInterval( screenWidth / groundSpeed))
         let removeCactus = SKAction.removeFromParent()
         let moveAndRemove = SKAction.sequence([moveCactus, removeCactus])
         
